@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
-Console.WriteLine("*** Storage Queue Receiver ***");
+Console.WriteLine("*** Storage Queue Sender ***");
 
 var builder = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -16,20 +16,9 @@ var queueName = "orders";
 
 var client = new QueueClient(conString, queueName);
 
-while (true)
-{
-    var msg = client.ReceiveMessage();
 
-    if (msg.Value == null)
-    {
-        Console.WriteLine("nix msg");
-    }
-    else
-    {
-        Console.WriteLine(msg.Value.MessageId);
-        Console.WriteLine(msg.Value.InsertedOn);
-        Console.WriteLine(msg.Value.Body);
-        client.DeleteMessage(msg.Value.MessageId, msg.Value.PopReceipt);
-    }
-    //Thread.Sleep(1000);
+for (int i = 0; i < 100; i++)
+{
+    await client.SendMessageAsync($"Test_{i:000}_{DateTime.Now:O}");
+    Console.WriteLine($"Sent: {i:000}");
 }
